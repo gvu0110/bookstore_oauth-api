@@ -10,8 +10,8 @@ const (
 
 type AccessToken struct {
 	AccessToken string `json:"access_token"`
-	UserId      int64  `json:"user_id"`
-	ClientId    int64  `json:"client_id"`
+	UserID      int64  `json:"user_id"`
+	ClientID    int64  `json:"client_id"`
 	Expires     int64  `json:"expires"`
 }
 
@@ -25,5 +25,5 @@ func (at AccessToken) IsExpired() bool {
 	return time.Unix(at.Expires, 0).Before(time.Now().UTC())
 }
 
-// Web frontend - ClientId: 123
+// Web frontend - ClientID: 123
 // Android app - ClientID: 234
