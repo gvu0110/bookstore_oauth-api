@@ -6,10 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gvu0110/bookstore_oauth-api/domain/access_token"
+	"github.com/gvu0110/bookstore_oauth-api/utils/errors"
 )
 
 type AccessTokenHandler interface {
 	GetByID(*gin.Context)
+	CreateAccessToken(*gin.Context)
 }
 
 type accessTokenHandler struct {
@@ -29,4 +31,17 @@ func (handler *accessTokenHandler) GetByID(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, accessToken)
+}
+
+func (handler *accessTokenHandler) CreateAccessToken(c *gin.Context) {
+	var at access_token.AccessToken
+	if err := c.ShouldBindJSON(&at); err != nil {
+		c.JSON(errors.NewBadRequestRESTError("Invalid JSON body").StatusCode, errors.NewBadRequestRESTError("Invalid JSON body"))
+		return
+	}
+	if err := handler.service.CreateAccessToken(at); err != nil {
+		c.JSON(err.StatusCode, err)
+		return
+	}
+	c.JSON(http.StatusCreated, at)
 }
