@@ -37,7 +37,7 @@ func (r *dbRepository) GetByID(id string) (*access_token.AccessToken, *errors.RE
 		if err.Error() == gocql.ErrNotFound.Error() {
 			return nil, errors.NewNotFoundRESTError("No access token found with the given ID")
 		}
-		return nil, errors.NewInternalServerError(err.Error())
+		return nil, errors.NewInternalServerRESTError(err.Error())
 	}
 	return &result, nil
 }
@@ -49,7 +49,7 @@ func (r *dbRepository) CreateAccessToken(at access_token.AccessToken) *errors.RE
 		at.ClientID,
 		at.Expires,
 	).Exec(); err != nil {
-		return errors.NewInternalServerError(err.Error())
+		return errors.NewInternalServerRESTError(err.Error())
 	}
 	return nil
 }
@@ -59,7 +59,7 @@ func (r *dbRepository) UpdateExpirationTime(at access_token.AccessToken) *errors
 		at.Expires,
 		at.AccessToken,
 	).Exec(); err != nil {
-		return errors.NewInternalServerError(err.Error())
+		return errors.NewInternalServerRESTError(err.Error())
 	}
 	return nil
 }

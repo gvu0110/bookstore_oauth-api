@@ -31,7 +31,5 @@ services:
         command: /bin/bash -c "echo Loading cassandra keyspace... && cqlsh cassandra -f /schema.cql"
  
 networks:
-    # frontend:
-    #     driver: bridge
     backend:
         driver: bridge

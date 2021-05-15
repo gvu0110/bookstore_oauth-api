@@ -28,7 +28,7 @@ func NewNotFoundRESTError(message string) *RESTError {
 }
 
 // NewInternalServerError creates a new internal server REST error
-func NewInternalServerError(message string) *RESTError {
+func NewInternalServerRESTError(message string) *RESTError {
 	return &RESTError{
 		StatusCode: http.StatusInternalServerError,
 		Message:    message,
