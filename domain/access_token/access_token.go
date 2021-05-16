@@ -1,9 +1,11 @@
 package access_token
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
+	"github.com/gvu0110/bookstore_oauth-api/utils/encryption"
 	"github.com/gvu0110/bookstore_oauth-api/utils/errors"
 )
 
@@ -16,6 +18,14 @@ type AccessToken struct {
 	UserID      int64  `json:"user_id"`
 	ClientID    int64  `json:"client_id"`
 	Expires     int64  `json:"expires"`
+}
+
+// Web frontend - ClientID: 123
+// Android app - ClientID: 234
+
+type AccessTokenRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (at *AccessToken) Validate() *errors.RESTError {
@@ -35,8 +45,8 @@ func (at *AccessToken) Validate() *errors.RESTError {
 	return nil
 }
 
-func GetNewAccessToken() *AccessToken {
-	return &AccessToken{
+func GetNewAccessToken() AccessToken {
+	return AccessToken{
 		Expires: time.Now().UTC().Add(expirationTime * time.Hour).Unix(),
 	}
 }
@@ -45,5 +55,6 @@ func (at AccessToken) IsExpired() bool {
 	return time.Unix(at.Expires, 0).Before(time.Now().UTC())
 }
 
-// Web frontend - ClientID: 123
-// Android app - ClientID: 234
+func (at *AccessToken) Generate() {
+	at.AccessToken = encryption.GetMD5(fmt.Sprintf("at-%d-%d-ran", at.UserID, at.Expires))
+}
