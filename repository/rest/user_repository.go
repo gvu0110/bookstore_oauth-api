@@ -11,7 +11,7 @@ import (
 
 var (
 	userRESTClient = rest.RequestBuilder{
-		BaseURL: "localhost",
+		BaseURL: "localhost:8080",
 		Timeout: 100 * time.Microsecond,
 	}
 )
@@ -32,6 +32,7 @@ func (r *usersRepository) LoginUser(email string, password string) (*users.User,
 		Password: password,
 	}
 	response := userRESTClient.Post("/users/login", request)
+	// Timeout
 	if response == nil || response.Response == nil {
 		return nil, errors.NewInternalServerRESTError("Invalid RESTClient response when trying to login user")
 	}
@@ -41,6 +42,7 @@ func (r *usersRepository) LoginUser(email string, password string) (*users.User,
 		if err := json.Unmarshal(response.Bytes(), &restErr); err != nil {
 			return nil, errors.NewInternalServerRESTError("Invalid error interface then trying to login user")
 		}
+		return nil, &restErr
 	}
 
 	var user users.User
