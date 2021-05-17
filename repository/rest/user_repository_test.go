@@ -5,27 +5,26 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mercadolibre/golang-restclient/rest"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
-	rest.StartMockupServer()
+	httpmock.ActivateNonDefault(restClient.GetClient())
 	os.Exit(m.Run())
 }
 
+func TestUserLoginAPIEndpointConst(t *testing.T) {
+	assert.EqualValues(t, "https://localhost:8080/users/login", UserLoginAPIEndpoint)
+}
+
 func TestLoginUserTimeoutFromAPI(t *testing.T) {
-	rest.FlushMockups()
-	rest.AddMockups(&rest.Mock{
-		URL:          "https://localhost:8080/users/login",
-		HTTPMethod:   http.MethodPost,
-		ReqBody:      `{"email":"email@example.com","password":"password"}`,
-		RespHTTPCode: -1,
-		RespBody:     `{}`,
-	})
+	httpmock.ActivateNonDefault(restClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+	mockURL := UserLoginAPIEndpoint
+	httpmock.RegisterResponder("POST", mockURL, nil)
 
 	repository := usersRepository{}
-
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
@@ -34,17 +33,14 @@ func TestLoginUserTimeoutFromAPI(t *testing.T) {
 }
 
 func TestLoginUserInvalidErrorInteraface(t *testing.T) {
-	rest.FlushMockups()
-	rest.AddMockups(&rest.Mock{
-		URL:          "https://localhost:8080/users/login",
-		HTTPMethod:   http.MethodPost,
-		ReqBody:      `{"email":"email@example.com","password":"password"}`,
-		RespHTTPCode: http.StatusInternalServerError,
-		RespBody:     `{"status_code":"404","message":"Invalid login credentials","error":"NOT FOUND"}`,
-	})
+	httpmock.ActivateNonDefault(restClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+	responseBody := `{"status_code":"404","message":"Invalid login credentials","error":"NOT FOUND"}`
+	responder := httpmock.NewStringResponder(http.StatusInternalServerError, responseBody)
+	mockURL := UserLoginAPIEndpoint
+	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
-
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
@@ -53,17 +49,14 @@ func TestLoginUserInvalidErrorInteraface(t *testing.T) {
 }
 
 func TestLoginUserInvalidUserCredentials(t *testing.T) {
-	rest.FlushMockups()
-	rest.AddMockups(&rest.Mock{
-		URL:          "https://localhost:8080/users/login",
-		HTTPMethod:   http.MethodPost,
-		ReqBody:      `{"email":"email@example.com","password":"password"}`,
-		RespHTTPCode: http.StatusNotFound,
-		RespBody:     `{"status_code": "404", "message": "Invalid login credentials", "error": "NOT FOUND"}`,
-	})
+	httpmock.ActivateNonDefault(restClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+	responseBody := `{"status_code": 404, "message": "Invalid login credentials", "error": "NOT FOUND"}`
+	responder := httpmock.NewStringResponder(http.StatusNotFound, responseBody)
+	mockURL := UserLoginAPIEndpoint
+	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
-
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
@@ -72,17 +65,14 @@ func TestLoginUserInvalidUserCredentials(t *testing.T) {
 }
 
 func TestLoginUserInvalidUserJSONResponse(t *testing.T) {
-	rest.FlushMockups()
-	rest.AddMockups(&rest.Mock{
-		URL:          "https://localhost:8080/users/login",
-		HTTPMethod:   http.MethodPost,
-		ReqBody:      `{"email":"email@example.com","password":"password"}`,
-		RespHTTPCode: http.StatusOK,
-		RespBody:     `{"id": "1", "first_name": "Adam", "last_name": "Vu", "email": "adam.vu@gmail.com", "date_created": "2006-01-02 15:04:05", "status": "active"}`,
-	})
+	httpmock.ActivateNonDefault(restClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+	responseBody := `{"id": "1", "first_name": "Adam", "last_name": "Vu", "email": "adam.vu@gmail.com", "date_created": "2006-01-02 15:04:05", "status": "active"}`
+	responder := httpmock.NewStringResponder(http.StatusOK, responseBody)
+	mockURL := UserLoginAPIEndpoint
+	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
-
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
@@ -91,17 +81,14 @@ func TestLoginUserInvalidUserJSONResponse(t *testing.T) {
 }
 
 func TestLoginUserNoError(t *testing.T) {
-	rest.FlushMockups()
-	rest.AddMockups(&rest.Mock{
-		URL:          "https://localhost:8080/users/login",
-		HTTPMethod:   http.MethodPost,
-		ReqBody:      `{"email":"email@example.com","password":"password"}`,
-		RespHTTPCode: http.StatusOK,
-		RespBody:     `{"id": 1, "first_name": "Adam", "last_name": "Vu", "email": "adam.vu@gmail.com", "date_created": "2006-01-02 15:04:05", "status": "active"}`,
-	})
+	httpmock.ActivateNonDefault(restClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+	responseBody := `{"id": 1, "first_name": "Adam", "last_name": "Vu", "email": "adam.vu@gmail.com", "date_created": "2006-01-02 15:04:05", "status": "active"}`
+	responder := httpmock.NewStringResponder(http.StatusOK, responseBody)
+	mockURL := UserLoginAPIEndpoint
+	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
-
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
