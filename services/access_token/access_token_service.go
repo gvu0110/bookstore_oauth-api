@@ -41,10 +41,15 @@ func (s *service) GetByID(accessTokenID string) (*access_token.AccessToken, *err
 }
 
 func (s *service) CreateAccessToken(request access_token.AccessTokenRequest) (*access_token.AccessToken, *errors.RESTError) {
+	if err := request.Validate(); err != nil {
+		return nil, err
+	}
+
+	// TODO: Support both grant types: password and client_credentials
 	// Authenticate the user against the Users API:
-	// if _, err := s.restUsersRepo.LoginUser(request.Email, request.Password); err != nil {
-	// 	return nil, err
-	// }
+	if _, err := s.restUsersRepo.LoginUser(request.Email, request.Password); err != nil {
+		return nil, err
+	}
 
 	// Generate a new access token:
 	at := access_token.GetNewAccessToken()
