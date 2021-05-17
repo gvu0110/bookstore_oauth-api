@@ -10,7 +10,9 @@ import (
 )
 
 const (
-	expirationTime = 24
+	expirationTime             = 24
+	grantTypePassword          = "password"
+	grantTypeClientCredentials = "client_credentials"
 )
 
 type AccessToken struct {
@@ -24,8 +26,15 @@ type AccessToken struct {
 // Android app - ClientID: 234
 
 type AccessTokenRequest struct {
+	GrantType string `json:"grant_type"`
+
+	// Used for "grant_type": "password"
 	Email    string `json:"email"`
 	Password string `json:"password"`
+
+	// Used for "grant_type": "client_credentials"
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
 }
 
 func (at *AccessToken) Validate() *errors.RESTError {
@@ -41,6 +50,18 @@ func (at *AccessToken) Validate() *errors.RESTError {
 	}
 	if at.Expires <= 0 {
 		return errors.NewBadRequestRESTError("Invalid expiration time")
+	}
+	return nil
+}
+
+func (at *AccessTokenRequest) Validate() *errors.RESTError {
+	switch at.GrantType {
+	case grantTypePassword:
+		break
+	case grantTypeClientCredentials:
+		break
+	default:
+		return errors.NewBadRequestRESTError("Invalid grant type parameter")
 	}
 	return nil
 }
