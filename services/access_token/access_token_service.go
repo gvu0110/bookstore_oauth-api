@@ -47,13 +47,15 @@ func (s *service) CreateAccessToken(request access_token.AccessTokenRequest) (*a
 
 	// TODO: Support both grant types: password and client_credentials
 	// Authenticate the user against the Users API:
-	if _, err := s.restUsersRepo.LoginUser(request.Email, request.Password); err != nil {
+	user, err := s.restUsersRepo.LoginUser(request.Email, request.Password)
+	if err != nil {
 		return nil, err
 	}
 
 	// Generate a new access token:
 	at := access_token.GetNewAccessToken()
 	at.Generate()
+	at.UserID = user.ID
 
 	// Save the new access token in Cassandra:
 	if err := s.dbRepo.CreateAccessToken(at); err != nil {

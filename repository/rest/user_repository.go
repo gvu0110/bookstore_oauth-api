@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	UserLoginAPIEndpoint = "https://localhost:8080/users/login"
+	UserLoginAPIEndpoint = "http://localhost:8081/users/login"
 )
 
 var (
@@ -34,7 +34,7 @@ func (r *usersRepository) LoginUser(email string, password string) (*users.User,
 	response, err := restClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(request).
-		Post("https://localhost:8080/users/login")
+		Post(UserLoginAPIEndpoint)
 
 	// Timeout
 	if err != nil {
