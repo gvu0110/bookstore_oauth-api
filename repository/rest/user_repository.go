@@ -51,7 +51,7 @@ func (r *usersRepository) LoginUser(email string, password string) (*users.User,
 
 	var user users.User
 	if err := json.Unmarshal(response.Body(), &user); err != nil {
-		return nil, errors.NewInternalServerRESTError("Error when trying to unmarshell user response")
+		return nil, errors.NewInternalServerRESTError("Error when trying to unmarshall user response")
 	}
 	return &user, nil
 }
