@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gvu0110/bookstore_oauth-api/utils/encryption"
-	"github.com/gvu0110/bookstore_oauth-api/utils/errors"
+	"github.com/gvu0110/bookstore_utils-go/encryption"
+	"github.com/gvu0110/bookstore_utils-go/rest_errors"
 )
 
 const (
@@ -37,31 +37,31 @@ type AccessTokenRequest struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-func (at *AccessToken) Validate() *errors.RESTError {
+func (at *AccessToken) Validate() *rest_errors.RESTError {
 	at.AccessToken = strings.TrimSpace(at.AccessToken)
 	if at.AccessToken == "" {
-		return errors.NewBadRequestRESTError("Invalid access token ID")
+		return rest_errors.NewBadRequestRESTError("Invalid access token ID")
 	}
 	if at.UserID <= 0 {
-		return errors.NewBadRequestRESTError("Invalid user ID")
+		return rest_errors.NewBadRequestRESTError("Invalid user ID")
 	}
 	if at.ClientID <= 0 {
-		return errors.NewBadRequestRESTError("Invalid client ID")
+		return rest_errors.NewBadRequestRESTError("Invalid client ID")
 	}
 	if at.Expires <= 0 {
-		return errors.NewBadRequestRESTError("Invalid expiration time")
+		return rest_errors.NewBadRequestRESTError("Invalid expiration time")
 	}
 	return nil
 }
 
-func (at *AccessTokenRequest) Validate() *errors.RESTError {
+func (at *AccessTokenRequest) Validate() *rest_errors.RESTError {
 	switch at.GrantType {
 	case grantTypePassword:
 		break
 	case grantTypeClientCredentials:
 		break
 	default:
-		return errors.NewBadRequestRESTError("Invalid grant type parameter")
+		return rest_errors.NewBadRequestRESTError("Invalid grant type parameter")
 	}
 	return nil
 }

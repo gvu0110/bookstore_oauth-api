@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/gvu0110/bookstore_oauth-api/domain/users"
-	"github.com/gvu0110/bookstore_oauth-api/utils/errors"
+	"github.com/gvu0110/bookstore_utils-go/rest_errors"
 )
 
 const (
@@ -17,7 +17,7 @@ var (
 )
 
 type RESTUsersRepository interface {
-	LoginUser(string, string) (*users.User, *errors.RESTError)
+	LoginUser(string, string) (*users.User, *rest_errors.RESTError)
 }
 
 type usersRepository struct{}
@@ -26,7 +26,7 @@ func NewRepository() RESTUsersRepository {
 	return &usersRepository{}
 }
 
-func (r *usersRepository) LoginUser(email string, password string) (*users.User, *errors.RESTError) {
+func (r *usersRepository) LoginUser(email string, password string) (*users.User, *rest_errors.RESTError) {
 	request := users.UserLoginRequest{
 		Email:    email,
 		Password: password,
@@ -38,20 +38,20 @@ func (r *usersRepository) LoginUser(email string, password string) (*users.User,
 
 	// Timeout
 	if err != nil {
-		return nil, errors.NewInternalServerRESTError("Invalid RESTClient response when trying to login user")
+		return nil, rest_errors.NewInternalServerRESTError("Invalid RESTClient response when trying to login user", err)
 	}
 
 	if response.StatusCode() > 299 {
-		var restErr errors.RESTError
+		var restErr rest_errors.RESTError
 		if err := json.Unmarshal(response.Body(), &restErr); err != nil {
-			return nil, errors.NewInternalServerRESTError("Invalid error interface then trying to login user")
+			return nil, rest_errors.NewInternalServerRESTError("Invalid error interface then trying to login user", err)
 		}
 		return nil, &restErr
 	}
 
 	var user users.User
 	if err := json.Unmarshal(response.Body(), &user); err != nil {
-		return nil, errors.NewInternalServerRESTError("Error when trying to unmarshall user response")
+		return nil, rest_errors.NewInternalServerRESTError("Error when trying to unmarshall user response", err)
 	}
 	return &user, nil
 }
