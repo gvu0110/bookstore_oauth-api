@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestUserLoginAPIEndpointConst(t *testing.T) {
-	assert.EqualValues(t, "https://localhost:8080/users/login", UserLoginAPIEndpoint)
+	assert.EqualValues(t, "http://localhost:8081/users/login", UserLoginAPIEndpoint)
 }
 
 func TestLoginUserTimeoutFromAPI(t *testing.T) {
