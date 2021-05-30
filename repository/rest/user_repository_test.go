@@ -28,15 +28,15 @@ func TestLoginUserTimeoutFromAPI(t *testing.T) {
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
-	assert.EqualValues(t, http.StatusInternalServerError, err.StatusCode)
-	assert.EqualValues(t, "Invalid RESTClient response when trying to login user", err.Message)
-	assert.EqualValues(t, "INTERNAL SERVER ERROR", err.Error)
+	assert.EqualValues(t, http.StatusInternalServerError, err.StatusCode())
+	assert.EqualValues(t, "Invalid RESTClient response when trying to login user", err.Message())
+	assert.EqualValues(t, "internal_server_error", err.Error())
 }
 
 func TestLoginUserInvalidErrorInteraface(t *testing.T) {
 	httpmock.ActivateNonDefault(restClient.GetClient())
 	defer httpmock.DeactivateAndReset()
-	responseBody := `{"status_code":"404","message":"Invalid login credentials","error":"NOT FOUND"}`
+	responseBody := `{"status_code":"404","message":"Invalid login credentials","error":"not_found"}`
 	responder := httpmock.NewStringResponder(http.StatusInternalServerError, responseBody)
 	mockURL := UserLoginAPIEndpoint
 	httpmock.RegisterResponder("POST", mockURL, responder)
@@ -45,15 +45,15 @@ func TestLoginUserInvalidErrorInteraface(t *testing.T) {
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
-	assert.EqualValues(t, http.StatusInternalServerError, err.StatusCode)
-	assert.EqualValues(t, "Invalid error interface then trying to login user", err.Message)
-	assert.EqualValues(t, "INTERNAL SERVER ERROR", err.Error)
+	assert.EqualValues(t, http.StatusInternalServerError, err.StatusCode())
+	assert.EqualValues(t, "Invalid error interface then trying to login user", err.Message())
+	assert.EqualValues(t, "internal_server_error", err.Error())
 }
 
 func TestLoginUserInvalidUserCredentials(t *testing.T) {
 	httpmock.ActivateNonDefault(restClient.GetClient())
 	defer httpmock.DeactivateAndReset()
-	responseBody := `{"status_code": 404, "message": "Invalid login credentials", "error": "NOT FOUND"}`
+	responseBody := `{"status_code": 404, "message": "Invalid login credentials", "error": "not_found"}`
 	responder := httpmock.NewStringResponder(http.StatusNotFound, responseBody)
 	mockURL := UserLoginAPIEndpoint
 	httpmock.RegisterResponder("POST", mockURL, responder)
@@ -62,9 +62,9 @@ func TestLoginUserInvalidUserCredentials(t *testing.T) {
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
-	assert.EqualValues(t, http.StatusNotFound, err.StatusCode)
-	assert.EqualValues(t, "Invalid login credentials", err.Message)
-	assert.EqualValues(t, "NOT FOUND", err.Error)
+	assert.EqualValues(t, http.StatusNotFound, err.StatusCode())
+	assert.EqualValues(t, "Invalid login credentials", err.Message())
+	assert.EqualValues(t, "not_found", err.Error())
 }
 
 func TestLoginUserInvalidUserJSONResponse(t *testing.T) {
@@ -79,9 +79,9 @@ func TestLoginUserInvalidUserJSONResponse(t *testing.T) {
 	user, err := repository.LoginUser("email@example.com", "password")
 	assert.Nil(t, user)
 	assert.NotNil(t, err)
-	assert.EqualValues(t, http.StatusInternalServerError, err.StatusCode)
-	assert.EqualValues(t, "Error when trying to unmarshall user response", err.Message)
-	assert.EqualValues(t, "INTERNAL SERVER ERROR", err.Error)
+	assert.EqualValues(t, http.StatusInternalServerError, err.StatusCode())
+	assert.EqualValues(t, "Error when trying to unmarshall user response", err.Message())
+	assert.EqualValues(t, "internal_server_error", err.Error())
 }
 
 func TestLoginUserNoError(t *testing.T) {

@@ -1,7 +1,13 @@
 package cassandra
 
 import (
+	"os"
+
 	"github.com/gocql/gocql"
+)
+
+const (
+	cassandra_address_env_var = "CASSANDRA_ADDRESS"
 )
 
 var (
@@ -10,7 +16,7 @@ var (
 
 func init() {
 	// Connect to the Cassandra cluster
-	cluster := gocql.NewCluster("localhost:9042")
+	cluster := gocql.NewCluster(os.Getenv(cassandra_address_env_var))
 	cluster.Keyspace = "oauth"
 	cluster.Consistency = gocql.Quorum
 
