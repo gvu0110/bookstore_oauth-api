@@ -15,13 +15,13 @@ func TestMain(m *testing.M) {
 }
 
 func TestUserLoginAPIEndpointConst(t *testing.T) {
-	assert.EqualValues(t, "http://localhost:8081/users/login", UserLoginAPIEndpoint)
+	assert.EqualValues(t, "USER_API_ENDPOINT", user_api_endpoint_env_var)
 }
 
 func TestLoginUserTimeoutFromAPI(t *testing.T) {
 	httpmock.ActivateNonDefault(restClient.GetClient())
 	defer httpmock.DeactivateAndReset()
-	mockURL := UserLoginAPIEndpoint
+	mockURL := os.Getenv(user_api_endpoint_env_var)
 	httpmock.RegisterResponder("POST", mockURL, nil)
 
 	repository := usersRepository{}
@@ -38,7 +38,7 @@ func TestLoginUserInvalidErrorInteraface(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 	responseBody := `{"status_code":"404","message":"Invalid login credentials","error":"not_found"}`
 	responder := httpmock.NewStringResponder(http.StatusInternalServerError, responseBody)
-	mockURL := UserLoginAPIEndpoint
+	mockURL := os.Getenv(user_api_endpoint_env_var)
 	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
@@ -55,7 +55,7 @@ func TestLoginUserInvalidUserCredentials(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 	responseBody := `{"status_code": 404, "message": "Invalid login credentials", "error": "not_found"}`
 	responder := httpmock.NewStringResponder(http.StatusNotFound, responseBody)
-	mockURL := UserLoginAPIEndpoint
+	mockURL := os.Getenv(user_api_endpoint_env_var)
 	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
@@ -72,7 +72,7 @@ func TestLoginUserInvalidUserJSONResponse(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 	responseBody := `{"id": "1", "first_name": "Adam", "last_name": "Vu", "email": "adam.vu@gmail.com", "date_created": "2006-01-02 15:04:05", "status": "active"}`
 	responder := httpmock.NewStringResponder(http.StatusOK, responseBody)
-	mockURL := UserLoginAPIEndpoint
+	mockURL := os.Getenv(user_api_endpoint_env_var)
 	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
@@ -89,7 +89,7 @@ func TestLoginUserNoError(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 	responseBody := `{"id": 1, "first_name": "Adam", "last_name": "Vu", "email": "adam.vu@gmail.com", "date_created": "2006-01-02 15:04:05", "status": "active"}`
 	responder := httpmock.NewStringResponder(http.StatusOK, responseBody)
-	mockURL := UserLoginAPIEndpoint
+	mockURL := os.Getenv(user_api_endpoint_env_var)
 	httpmock.RegisterResponder("POST", mockURL, responder)
 
 	repository := usersRepository{}
@@ -102,4 +102,8 @@ func TestLoginUserNoError(t *testing.T) {
 	assert.EqualValues(t, "adam.vu@gmail.com", user.Email)
 	assert.EqualValues(t, "2006-01-02 15:04:05", user.DateCreated)
 	assert.EqualValues(t, "active", user.Status)
+}
+
+func TestNewRepository(t *testing.T) {
+	assert.NotNil(t, &usersRepository{}, NewRepository())
 }
