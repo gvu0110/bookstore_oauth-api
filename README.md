@@ -16,3 +16,8 @@ docker-compose up -d cassandra cassandra-load-keyspace
 export CASSANDRA_ADDRESS=localhost:9042
 go run main.go
 ```
+3. Unit test coverage
+```shell
+go test -v -coverprofile cover.out .
+go tool cover -html=cover.out -o cover.html
+```

@@ -10,8 +10,12 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+cover.html
 
 # Dependency directories
 vendor/
 go.mod
 go.sum
+
+# MacOS DS_Store
+**/.DS_Store
