@@ -14,6 +14,7 @@ docker-compose up -d cassandra cassandra-load-keyspace
 2. Run locally oauth-api app
 ```shell
 export CASSANDRA_ADDRESS=localhost:9042
+export USER_API_ENDPOINT=http://localhost:8081/users/login
 go run main.go
 ```
 3. Unit test coverage

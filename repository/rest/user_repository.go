@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/gvu0110/bookstore_oauth-api/domain/users"
@@ -9,7 +10,7 @@ import (
 )
 
 const (
-	UserLoginAPIEndpoint = "http://localhost:8081/users/login"
+	user_api_endpoint_env_var = "USER_API_ENDPOINT"
 )
 
 var (
@@ -34,7 +35,7 @@ func (r *usersRepository) LoginUser(email string, password string) (*users.User,
 	response, err := restClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(request).
-		Post(UserLoginAPIEndpoint)
+		Post(os.Getenv(user_api_endpoint_env_var))
 
 	// Timeout
 	if err != nil {
