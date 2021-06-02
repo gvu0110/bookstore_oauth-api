@@ -13,6 +13,7 @@ import (
 type AccessTokenHandler interface {
 	GetByID(*gin.Context)
 	CreateAccessToken(*gin.Context)
+	DeleteAccessToken(*gin.Context)
 }
 
 type accessTokenHandler struct {
@@ -47,4 +48,20 @@ func (handler *accessTokenHandler) CreateAccessToken(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, at)
+}
+
+func (handler *accessTokenHandler) DeleteAccessToken(c *gin.Context) {
+	accessToken := strings.TrimSpace(c.Param("access_token_id"))
+	var request atDomain.AccessTokenRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(rest_errors.NewBadRequestRESTError("Invalid JSON body").StatusCode(), rest_errors.NewBadRequestRESTError("Invalid JSON body"))
+		return
+	}
+
+	if err := handler.service.DeleteAccessToken(accessToken, request); err != nil {
+		c.String(err.StatusCode(), err.Message())
+		return
+	}
+	responseBody := `"status":"deleted"`
+	c.JSON(http.StatusOK, responseBody)
 }

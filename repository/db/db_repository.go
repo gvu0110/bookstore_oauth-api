@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/gocql/gocql"
 	"github.com/gvu0110/bookstore_oauth-api/clients/cassandra"
 	"github.com/gvu0110/bookstore_oauth-api/domain/access_token"
@@ -11,12 +13,14 @@ const (
 	queryGetAccessToken       = "SELECT access_token, user_id, client_id, expires FROM access_tokens WHERE access_token=?;"
 	queryCreateAccessToken    = "INSERT INTO access_tokens (access_token, user_id, client_id, expires) VALUES (?, ?, ?, ?);"
 	queryUpdateExpirationTime = "UPDATE access_tokens SET expires=? WHERE access_token=?;"
+	queryDeleteAccessToken    = "DELETE FROM access_tokens WHERE access_token=?;"
 )
 
 type DbRepository interface {
 	GetByID(string) (*access_token.AccessToken, rest_errors.RESTError)
 	CreateAccessToken(access_token.AccessToken) rest_errors.RESTError
 	UpdateExpirationTime(access_token.AccessToken) rest_errors.RESTError
+	DeleteAccessToken(string) rest_errors.RESTError
 }
 
 type dbRepository struct {
@@ -60,6 +64,13 @@ func (r *dbRepository) UpdateExpirationTime(at access_token.AccessToken) rest_er
 		at.AccessToken,
 	).Exec(); err != nil {
 		return rest_errors.NewInternalServerRESTError("Error when trying to update access token expiration time", err)
+	}
+	return nil
+}
+
+func (r *dbRepository) DeleteAccessToken(id string) rest_errors.RESTError {
+	if err := cassandra.GetSession().Query(queryDeleteAccessToken, id).Exec(); err != nil {
+		return rest_errors.NewInternalServerRESTError(fmt.Sprintf("Error when trying to delete access token by ID %s", id), err)
 	}
 	return nil
 }

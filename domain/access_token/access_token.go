@@ -15,6 +15,7 @@ const (
 	grantTypeClientCredentials = "client_credentials"
 )
 
+// TODO: add refresh access token
 type AccessToken struct {
 	AccessToken string `json:"access_token"`
 	UserID      int64  `json:"user_id"`
