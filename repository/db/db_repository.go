@@ -32,7 +32,7 @@ func NewRepository() DbRepository {
 
 func (r *dbRepository) GetByID(id string) (*access_token.AccessToken, rest_errors.RESTError) {
 	var result access_token.AccessToken
-	if err := cassandra.GetSession().Query(queryGetAccessToken, id).Scan(
+	if err := cassandra.NewConnection().Query(queryGetAccessToken, id).Scan(
 		&result.AccessToken,
 		&result.UserID,
 		&result.ClientID,
@@ -47,7 +47,7 @@ func (r *dbRepository) GetByID(id string) (*access_token.AccessToken, rest_error
 }
 
 func (r *dbRepository) CreateAccessToken(at access_token.AccessToken) rest_errors.RESTError {
-	if err := cassandra.GetSession().Query(queryCreateAccessToken,
+	if err := cassandra.NewConnection().Query(queryCreateAccessToken,
 		at.AccessToken,
 		at.UserID,
 		at.ClientID,
@@ -59,7 +59,7 @@ func (r *dbRepository) CreateAccessToken(at access_token.AccessToken) rest_error
 }
 
 func (r *dbRepository) UpdateExpirationTime(at access_token.AccessToken) rest_errors.RESTError {
-	if err := cassandra.GetSession().Query(queryUpdateExpirationTime,
+	if err := cassandra.NewConnection().Query(queryUpdateExpirationTime,
 		at.Expires,
 		at.AccessToken,
 	).Exec(); err != nil {
@@ -69,7 +69,7 @@ func (r *dbRepository) UpdateExpirationTime(at access_token.AccessToken) rest_er
 }
 
 func (r *dbRepository) DeleteAccessToken(id string) rest_errors.RESTError {
-	if err := cassandra.GetSession().Query(queryDeleteAccessToken, id).Exec(); err != nil {
+	if err := cassandra.NewConnection().Query(queryDeleteAccessToken, id).Exec(); err != nil {
 		return rest_errors.NewInternalServerRESTError(fmt.Sprintf("Error when trying to delete access token by ID %s", id), err)
 	}
 	return nil
