@@ -1,7 +1,7 @@
-version: '3'
+version: '3.1'
 
 services:
-  app:
+  oauth-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,10 +11,9 @@ services:
       - "8080:8080"
     environment:
       CASSANDRA_ADDRESS: cassandra:9042
+      USER_API_ENDPOINT: http://users-api:8081/users/login
     depends_on:
       - cassandra
-    networks:
-      - backend
 
   cassandra:
     image: cassandra:3.11.2
@@ -25,8 +24,6 @@ services:
       - "MAX_HEAP_SIZE=256M"
       - "HEAP_NEWSIZE=128M"
     restart: always
-    networks:
-      - backend
     healthcheck:
       test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces"]
       interval: 20s
@@ -39,12 +36,11 @@ services:
     depends_on:
       cassandra:
         condition: service_healthy
-    networks:
-      - backend
     volumes:
       - ./cassandra_schema.cql:/schema.cql
     command: /bin/bash -c "echo Loading cassandra keyspace... && cqlsh cassandra -f /schema.cql"
 
-networks:
-  backend:
-    driver: bridge
+networks: 
+  default:
+    external: true
+    name: shared-backend

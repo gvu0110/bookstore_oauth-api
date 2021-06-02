@@ -22,3 +22,12 @@ go run main.go
 go test -v -coverprofile cover.out .
 go tool cover -html=cover.out -o cover.html
 ```
+4. Run locally with docker-compose.
+- Make sure the external network `shared-backend` is existing
+```shell
+docker network create shared-backend
+```
+- Run docker-compose
+```
+docker-compose up --build
+```
